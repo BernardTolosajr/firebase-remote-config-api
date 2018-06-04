@@ -1,5 +1,6 @@
-# baz-api
+# Remote firebase api
 
+REST api for Firebase remote config
 
 
 ## QuickStart
