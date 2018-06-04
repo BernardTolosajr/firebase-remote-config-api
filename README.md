@@ -8,6 +8,12 @@
 
 see [egg docs][egg] for more detail.
 
+### Database
+Run the following in your terminal:
+```bash
+$ brew update && brew install rethinkdb
+```
+
 ### Development
 
 ```bash
