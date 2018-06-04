@@ -6,8 +6,6 @@ const fs = require('fs');
 const util = require('util');
 var _ = require('lodash');
 
-const SCOPES = ['https://www.googleapis.com/auth/firebase.remoteconfig'];
-
 const r = require('rethinkdbdash')({
   port: 28015,
   host: 'localhost',
@@ -16,7 +14,58 @@ const r = require('rethinkdbdash')({
 
 class Firebase extends Service {
   async updateConfig(params) {
-    console.log('here')
+    const token = await this._getAccessToken()
+    const { url } = this.config.firebase
+
+    async.waterfall([
+      function(callback) {
+        const data = r.table('configs').run().then((result) => {
+          const { id } = result[0]
+          callback(null, id)
+        })
+      },
+      function(id, callback) {
+        const { parameters } = params
+        r.table('configs').get(id).update({ parameters }).run().then((result) => {
+          callback(null, id)
+        })
+      },
+      function(id, callback) {
+        r.table('configs').get(id).run().then((result) => {
+          callback(null, result)
+        })
+      },
+      function(config, callback) {
+        const { id, etag, parameters } = config
+        axios({
+          method: 'put',
+          url: url,
+          headers: {
+            Authorization: 'Bearer ' + token,
+            'Content-Type': 'application/json; UTF-8',
+            'Accept-Encoding': 'gzip',
+            'If-Match': etag
+          },
+          data: { parameters }
+        }).then((response) => {
+          if (response.status === 200) {
+            const etag = response.headers['etag']
+            // update new etag
+            r.table('configs').get(id).update({ etag }).run().then((result) => {
+              callback(null, true)
+            })
+          } else {
+            callback(null, false)
+          }
+        })
+      }
+    ], function(err, result) {
+      if (err) {
+        console.log(err)
+        return
+      }
+      console.log('success')
+    });
   }
 
   async getConfigs() {
@@ -31,13 +80,22 @@ class Firebase extends Service {
             url: url,
             headers: {
               Authorization: 'Bearer ' + token,
+              'Accept-Encoding': 'gzip'
             }
           }).then((response) => {
+            const etag = response.headers['etag']
+            const { parameters } = response.data
+
+            const data = {
+              etag: etag,
+              parameters,
+            }
+
             r.table('configs').count().run().then((count) => {
               if (count) {
                 r.table('configs').run().then((configs) => {
                   const id = configs[0].id;
-                  r.table('configs').get(id).update(response.data).run().then((result) => {
+                  r.table('configs').get(id).update(data).run().then((result) => {
                     callback(null, true)
                   })
                 });

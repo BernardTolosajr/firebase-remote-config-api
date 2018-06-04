@@ -9,9 +9,9 @@ class ConfigController extends Controller {
   }
 
   async update() {
-    const params = this.ctx.params;
-    await this.ctx.service.firebase.updateConfig(params)
-    this.ctx.body = { success: true }
+    const params = this.ctx.request.body;
+    const response = await this.ctx.service.firebase.updateConfig(params)
+    this.ctx.body = response
   }
 }
 
