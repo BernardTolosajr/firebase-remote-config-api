@@ -1,0 +1,19 @@
+{
+  "parameters": {
+    "foo": {
+      "defaultValue": {
+        "value": "bar"
+      }
+    },
+    "bar": {
+      "defaultValue": {
+        "value": "[foo, bar]"
+      }
+    },
+    "baz": {
+      "defaultValue": {
+        "value": "{\"name\": \"bar\"}"
+      }
+    }
+  }
+}
