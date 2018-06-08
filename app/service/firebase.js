@@ -123,8 +123,11 @@ class Firebase extends Service {
           r.table('configs').run().then((result) => {
             const parameter = result[0].parameters;
             const c = Object.keys(parameter).map(key => {
-              const obj = {};
-              obj[key] = parameter[key]
+              const { defaultValue } = parameter[key]
+              const obj = {
+                title: key,
+                defaultValue,
+              };
               return obj
             });
 
