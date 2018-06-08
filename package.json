@@ -7,10 +7,13 @@
   "dependencies": {
     "async": "^2.6.1",
     "axios": "^0.18.0",
+    "bcrypt": "^2.0.1",
     "egg": "^2.2.1",
     "egg-scripts": "^2.5.0",
     "google-auth-library": "^1.5.0",
     "googleapis": "^20.1.0",
+    "jsonwebtoken": "^8.2.2",
+    "koa-jwt": "^3.3.2",
     "lodash": "^4.17.10",
     "rethinkdbdash": "^2.3.31"
   },
