@@ -24,13 +24,14 @@ class User extends Service {
 
   async signIn(params) {
     const { username, password } = params
+
     const users = await r.table('users').filter({
       username
     }).run()
 
     if (users.length === 0) {
       return {
-        success: false
+        error: 'not found'
       }
     }
 
@@ -54,4 +55,3 @@ class User extends Service {
 }
 
 module.exports = User;
-
